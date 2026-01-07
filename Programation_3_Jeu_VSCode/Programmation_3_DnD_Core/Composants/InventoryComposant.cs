@@ -1,0 +1,152 @@
+﻿using System;
+using System.Collections.Generic;
+
+namespace Programation_3_DnD_Core
+{
+    public class InventoryComposant : Composant
+    {
+        // Variables
+        private List<ItemComposant> _items;
+        private List<int> _counts;
+        private IOutput _renderer;
+
+        // Constructeur
+        public InventoryComposant(IOutput renderer)
+        {
+            _renderer = renderer;
+            _items = new List<ItemComposant>();
+            _counts = new List<int>();
+        }
+
+        // Méthodes
+        public void Add(ItemComposant item, int count)
+        {
+            if (item == null) return;
+            if (count <= 0) return;
+
+            for (int i = 0; i < _items.Count; i++)
+            {
+                if (_items[i] == item)
+                {
+                    _counts[i] += count;
+                    return;
+                }
+            }
+            _items.Add(item);
+            _counts.Add(count);
+        }
+        public bool AddByName(string name, int count)
+        {
+            if (count < 1)
+            {
+                return false;
+            }
+
+            for (int i = 0 ; i < _counts.Count; i++)
+            {
+                if (_items[i].GetName() == name)
+                {
+                    _counts[i] += count;
+                    return true;
+                }
+            }
+
+            return false;
+        }
+        public bool RemoveByName(string item_name, int count)
+        {
+            if (count < 1) return false;
+
+            for (int i = 0; i < _items.Count; i++)
+            {
+                if (_items[i].GetName() == item_name)
+                {
+                    if (_counts[i] < count) return false;
+
+                    _counts[i] -= count;
+                    if (_counts[i] == 0)
+                    {
+                        _items.RemoveAt(i);
+                        _counts.RemoveAt(i);
+                    }
+                    return true;
+                }
+            }
+
+            return false;
+        }
+        public bool RemoveAtIndex(int index, int count)
+        {
+            if (index < 0 || index >= _items.Count) return false;
+            if (count <= 0) return false;
+
+            if (_counts[index] < count) return false;
+
+            _counts[index] -= count;
+            if (_counts[index] == 0)
+            {
+                _items.RemoveAt(index);
+                _counts.RemoveAt(index);
+            }
+
+            return true;
+        }
+
+        // Getters
+        public int GetCount(string item_name)
+        {
+            for (int i = 0; i < _items.Count; i++)
+            {
+                if (_items[i].GetName() == item_name)
+                {
+                    return _counts[i];
+                }
+            }
+
+            return 0;
+        }
+        public int GetCountByIndex(int index)
+        {
+            if (index < 0 || index >= _counts.Count)
+            {
+                return 0;
+            }
+
+            return _counts[index];
+        }
+        public ItemComposant GetItemByName(string item_name)
+        {
+            for (int i = 0; i < _items.Count; i++)
+            {
+                if (_items[i].GetName() == item_name)
+                {
+                    return _items[i];
+                }
+            }
+            return null;
+        }
+        public ItemComposant GetItemByIndex(int index)
+        {
+            if (index < 0 || index >= _items.Count)
+            {
+                return null;
+            }
+
+            return _items[index];
+        }
+        public int GetItemCount()
+        {
+            return _items.Count;
+        }
+
+        // Logique
+        public override void TreatInput(IInput input_manager) { }
+        public override void Update() { }
+        public override void FixedUpdate(float time) { }
+
+    public override void Render()
+        {
+            _renderer.SetInventory(this);
+        }
+    }
+}
